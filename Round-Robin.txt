@@ -1,0 +1,99 @@
+    ORG    0x000
+V0:    WORD    $INT0, 0x180
+V1:    WORD    $DEFAULT, 0x180
+V2:    WORD    $DEFAULT, 0x180
+V3:    WORD    $DEFAULT, 0x180
+V4:    WORD    $DEFAULT, 0x180
+V5:    WORD    $DEFAULT, 0x180
+V6:    WORD    $DEFAULT, 0x180
+V7:    WORD    $DEFAULT, 0x180
+    ORG    0x015
+TIME:    WORD    0x0
+X:    WORD    0x0
+FLAG_STOP:    WORD    0x0
+DEFAULT:    IRET    
+START:    DI    
+    CLA    
+    OUT    0x7
+    OUT    0xB
+    OUT    0xF
+    OUT    0x13
+    OUT    0x17
+    OUT    0x1B
+    OUT    0x1F
+    OUT    0x5
+    LD    #0x0
+    OUT    0x3
+    LD    #0x8
+    OUT    0x1
+    LD    #0x7F
+    OUT    0x0
+        
+    JUMP    MAIN
+MAIN:    CLA    
+    CALL    TASK1
+    LD    TIME
+    CMP    #0x4
+    BMI    NOT_TIME_T3
+    CALL    TASK3
+NOT_TIME_T3:    LD    TIME
+    CMP    #0x2
+    BMI    NOT_TIME_T2
+    CALL    TASK2
+NOT_TIME_T2:    LD    TIME
+    CMP    #0xA
+    BMI    REPEAT
+    LD    #0xA
+    ST    TIME
+REPEAT:    JUMP    MAIN
+INT0:    DI    
+    PUSH    
+    LD    TIME
+    INC    
+    ST    TIME
+    LD    #0x1
+    ST    FLAG_STOP
+    POP    
+    HLT    
+    IN    0x0
+    LD    #0x7F
+    OUT    0x0
+    EI    
+    IRET    
+TASK1:    LD     X
+    INC    
+    ST     X
+    EI    
+    NOP    
+    DI    
+    LD     FLAG_STOP
+    BEQ    TASK1
+    LD    #0x0
+    ST     FLAG_STOP
+    RET    
+TASK3:    LD     X
+    DEC    
+    DEC    
+    DEC    
+    ST     X
+    RET    
+    EI    
+    NOP    
+    DI    
+    LD     FLAG_STOP
+    BEQ    TASK3
+    LD    #0x0
+    ST     FLAG_STOP
+    RET    
+TASK2:    LD     X
+    INC    
+    INC    
+    ST     X
+    EI    
+    NOP    
+    DI    
+    LD     FLAG_STOP
+    BEQ    TASK2
+    LD    #0x0
+    ST     FLAG_STOP
+    RET
